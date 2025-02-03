@@ -2,20 +2,56 @@ namespace BlockBlast
 {
     public class BlockLayout
     {
-        struct L_Shape
+        class L_Shape
         {
-            public int x;
-            public int y;
+            public static readonly bool[,] shape = new bool[,]
+            {
+                { true, false },
+                { true, false },
+                { true, true }
+            };
         }
-        struct T_Shape
+    }
+
+        class T_Shape
         {
-            public int x;
-            public int y;
+            public static readonly bool[,] shape = new bool[,]
+            {
+                { true, true, true },
+                { false, true, false },
+                { false, true, false }
+            };
         }
-        struct I_Shape
+
+        class i_Shape
         {
-            public int x;
-            public int y;
+            public static readonly bool[,] shape = new bool[,]
+            {
+                { true },
+                { true },
+                { true },
+                { true }
+            };
         }
+
+        class O_Shape
+        {
+            public static readonly bool[,] shape = new bool[,]
+            {
+                { true, true },
+                { true, true }
+            };
+        }
+
+        class S_Shape
+        {
+            public static readonly bool[,] shape = new bool[,]
+            {
+                { false, true, true },
+                { true, true, false }
+            };
+        }
+
+    
     }
 }
