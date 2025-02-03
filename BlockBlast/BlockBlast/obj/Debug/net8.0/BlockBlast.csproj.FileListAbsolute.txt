@@ -24,3 +24,4 @@ c:\Users\leonp\Documents\randomgamesimade\BlockBlashUTC\BlockBlast\BlockBlast\ob
 c:\Users\leonp\Documents\randomgamesimade\BlockBlashUTC\BlockBlast\BlockBlast\obj\Debug\net8.0\BlockBlast.genruntimeconfig.cache
 c:\Users\leonp\Documents\randomgamesimade\BlockBlashUTC\BlockBlast\BlockBlast\obj\Debug\net8.0\ref\BlockBlast.dll
 c:\Users\leonp\Documents\randomgamesimade\BlockBlashUTC\BlockBlast\BlockBlast\obj\Debug\net8.0\BlockBlast.sourcelink.json
+c:\Users\leonp\Documents\randomgamesimade\BlockBlashUTC\BlockBlast\BlockBlast\bin\Debug\net8.0\Content\block.xnb

@@ -32,6 +32,8 @@ public class Game1 : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
+        _graphics.PreferredBackBufferWidth = 600;
+        _graphics.PreferredBackBufferHeight = 800;
     }
 
     private void BoardInitilizer(bool value, int padding)
@@ -46,9 +48,7 @@ public class Game1 : Game
         float centreXPad =
             Window.ClientBounds.Width / 2
             - (_blockSize.X + padding) * _backroundBlockPosition.GetLength(0) / 2;
-        float centreYPad =
-            Window.ClientBounds.Height / 4
-            - (_blockSize.Y + padding) * _backroundBlockPosition.GetLength(1) / 2;
+        float centreYPad = Window.ClientBounds.Height * 0.1f;
         for (int x = 0; x < _backroundBlockPosition.GetLength(0); x++)
         {
             for (int y = 0; y < _backroundBlockPosition.GetLength(1); y++)
@@ -75,10 +75,10 @@ public class Game1 : Game
         var rectangleTexture = new RectangleTexture();
 
         //Textures
-        // _blockTexture = Content.Load<Texture2D>("block");
+        _blockTexture = Content.Load<Texture2D>("block");
         _backgroundBlockTexture = rectangleTexture.CreateTexture(_blockSize, _primitiveBatch);
     }
-
+    
     protected override void Update(GameTime gameTime)
     {
         if (
@@ -86,9 +86,8 @@ public class Game1 : Game
             || Keyboard.GetState().IsKeyDown(Keys.Escape)
         )
             Exit();
-        
-        BoardInitilizer(false, 10);
 
+        BoardInitilizer(false, 10);
 
         // TODO: Add your update logic here
 
