@@ -10,7 +10,7 @@ namespace Vector
         public Texture2D WhiteCircle;
         public GraphicsDevice graphicsDevice;
 
-        public void Primitive(GraphicsDevice graphicsDevice)       
+        public PrimitiveBatch(GraphicsDevice graphicsDevice)
         {
             this.graphicsDevice = graphicsDevice;
             CreateTextures();
@@ -21,7 +21,7 @@ namespace Vector
             WhitePixel = new Texture2D(graphicsDevice, 1, 1);
             WhitePixel.SetData(new[] { Color.White });
 
-            int diameter = 100; 
+            int diameter = 100;
             WhiteCircle = new Texture2D(graphicsDevice, diameter, diameter);
             Color[] colorData = new Color[diameter * diameter];
 
@@ -75,11 +75,7 @@ namespace Vector
                 Width = width;
             }
 
-            public void Draw(
-                SpriteBatch spriteBatch,
-                PrimitiveBatch primitiveBatch
-                
-            )
+            public void Draw(SpriteBatch spriteBatch, PrimitiveBatch primitiveBatch)
             {
                 Vector2 edge = End - Start;
                 float angle = (float)Math.Atan2(edge.Y, edge.X);
@@ -114,15 +110,11 @@ namespace Vector
                 Color = color;
             }
 
-            public void Draw(
-                SpriteBatch spriteBatch,
-                PrimitiveBatch primitiveBatch
-                 
-            )
+            public void Draw(SpriteBatch spriteBatch, PrimitiveBatch primitiveBatch)
             {
                 spriteBatch.Draw(
                     primitiveBatch.WhiteCircle,
-                    Position ,
+                    Position,
                     null,
                     Color,
                     0,
@@ -152,53 +144,62 @@ namespace Vector
                 Size = size;
                 Color = color;
             }
-            public Rectangle(Microsoft.Xna.Framework.Rectangle rectangle,Color color)
+
+            public Rectangle(Microsoft.Xna.Framework.Rectangle rectangle, Color color)
             {
-                Position = new Vector2(rectangle.X,rectangle.Y);
-                Size = new Vector2(rectangle.Width,rectangle.Height);
+                Position = new Vector2(rectangle.X, rectangle.Y);
+                Size = new Vector2(rectangle.Width, rectangle.Height);
                 Color = color;
             }
 
-            public void Draw(
-                SpriteBatch spriteBatch,
-                PrimitiveBatch primitiveBatch
-                 
-            )
+            public void Draw(SpriteBatch spriteBatch, PrimitiveBatch primitiveBatch)
             {
                 spriteBatch.Draw(
                     primitiveBatch.WhitePixel,
-                    
-                        new Microsoft.Xna.Framework.Rectangle(
-                            (int)(Position.X),
-                            (int)(Position.Y ),
-                            (int)Size.X,
-                            (int)Size.Y
-                        ),
+                    new Microsoft.Xna.Framework.Rectangle(
+                        (int)(Position.X),
+                        (int)(Position.Y),
+                        (int)Size.X,
+                        (int)Size.Y
+                    ),
                     Color
                 );
-                }
             }
         }
+    }
 
-        public class Pixel
+    public class RectangleTexture
+    {
+        public Vector2 size;
+        private Texture2D texture;
+
+        public Texture2D CreateTexture(Vector2 size, PrimitiveBatch primitiveBatch)
         {
-            public Vector2 Position;
-            public Color Color;
+            this.size = size;
 
-            public Pixel(Vector2 position, Color color)
-            {
-                Position = position;
-                Color = color;
-            }
+            texture = new Texture2D(primitiveBatch.graphicsDevice, (int)size.X, (int)size.Y);
+            Color[] data = new Color[(int)size.X * (int)size.Y];
+            for (int i = 0; i < data.Length; ++i)
+                data[i] = Color.White;
+            texture.SetData(data);
+            return texture;
+        }
+    }
 
-            public void Draw(
-                SpriteBatch spriteBatch,
-                PrimitiveBatch primitiveBatch
-                
-            )
-            {
-                spriteBatch.Draw(primitiveBatch.WhitePixel, Position, Color);
-            }
+    public class Pixel
+    {
+        public Vector2 Position;
+        public Color Color;
+
+        public Pixel(Vector2 position, Color color)
+        {
+            Position = position;
+            Color = color;
+        }
+
+        public void Draw(SpriteBatch spriteBatch, PrimitiveBatch primitiveBatch)
+        {
+            spriteBatch.Draw(primitiveBatch.WhitePixel, Position, Color);
         }
     }
 }
