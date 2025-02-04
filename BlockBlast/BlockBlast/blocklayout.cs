@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using Microsoft.Xna.Framework;
 
 namespace BlockBlast
@@ -7,6 +8,8 @@ namespace BlockBlast
         public Vector2 position;
         public Vector2[] squarePositions;
         public bool[,] shape;
+        
+        public bool isdragable = true;
 
         public BlockLayout(Vector2 position, bool[,] shape)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Threading;
 using Microsoft.Xna.Framework;
@@ -32,8 +33,7 @@ public class Game1 : Game
 
     private List<BlockLayout> _blocks = new List<BlockLayout>();
 
-
-    private Vector2[,] _backroundBlockPosition = new Vector2[8, 8];
+    private Vector2[,] _backroundBlockPositions = new Vector2[8, 8];
 
     //general control dataa
 
@@ -61,13 +61,13 @@ public class Game1 : Game
         }
         float centreXPad =
             Window.ClientBounds.Width / 2
-            - (_BLOCKSIZE.X + padding) * _backroundBlockPosition.GetLength(0) / 2;
+            - (_BLOCKSIZE.X + padding) * _backroundBlockPositions.GetLength(0) / 2;
         float centreYPad = Window.ClientBounds.Height * 0.1f;
-        for (int x = 0; x < _backroundBlockPosition.GetLength(0); x++)
+        for (int x = 0; x < _backroundBlockPositions.GetLength(0); x++)
         {
-            for (int y = 0; y < _backroundBlockPosition.GetLength(1); y++)
+            for (int y = 0; y < _backroundBlockPositions.GetLength(1); y++)
             {
-                _backroundBlockPosition[y, x] = new Vector2(
+                _backroundBlockPositions[y, x] = new Vector2(
                     centreXPad + x * (_BLOCKSIZE.X + padding),
                     centreYPad + y * (_BLOCKSIZE.Y + padding)
                 );
@@ -131,22 +131,39 @@ public class Game1 : Game
             _isDragging = false;
         }
         _previousMousePosition = currentMousePosition;
-
-        
+        if (!_isDragging)
+        {
+            LockToGrid(ref test);
+        }
 
         // TODO: Add your update logic here
 
         base.Update(gameTime);
     }
+
     private void LockToGrid(ref BlockLayout block)
     {
+        Vector2[] newsquares = new Vector2[block.squarePositions.Length];
+        byte sqrcheck = 0;
         for (int i = 0; i < block.squarePositions.Length; i++)
         {
             Vector2 square = block.squarePositions[i];
-    
-            // block.position = gridPosition * (_BLOCKSIZE + _PADDING);
+            foreach (Vector2 gridPosition in _backroundBlockPositions)
+            {
+                if (Vector2.Distance(square, gridPosition) < 16)
+                {
+                    Console.WriteLine($"Square: {square} Grid: {gridPosition}");
+                    newsquares[i] = gridPosition;
+                    sqrcheck++;
+                    break;
+                }
+            }
         }
-
+        if (sqrcheck == block.squarePositions.Length)
+        {
+            block.position = newsquares[0];
+            block.squarePositions = newsquares;
+        }
     }
 
     private bool IsmouseOverRectangle(Vector2 position, Vector2 size, MouseState mouseState)
@@ -201,7 +218,7 @@ public class Game1 : Game
                 {
                     _spriteBatch.Draw(
                         _backgroundBlockTexture,
-                        _backroundBlockPosition[i, j],
+                        _backroundBlockPositions[i, j],
                         backgroundBlockColor
                     );
                 }
