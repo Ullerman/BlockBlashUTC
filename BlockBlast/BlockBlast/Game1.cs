@@ -24,6 +24,7 @@ public class Game1 : Game
 
     //Texture Data
     private Vector2 _BLOCKSIZE = new Vector2(50);
+    private const float _PLATERADIUS = 100;
     private const float _PADDING = 5;
 
     //Board Data
@@ -36,6 +37,8 @@ public class Game1 : Game
     private BlockLayout[] _pickBlocks = new BlockLayout[3];
 
     private Vector2[,] _backroundBlockPositions = new Vector2[8, 8];
+
+    private PrimitiveBatch.Circle[] blockSpawnPlates = new PrimitiveBatch.Circle[3];
 
     //general control dataa
 
@@ -76,6 +79,19 @@ public class Game1 : Game
                     centreYPad + y * (_BLOCKSIZE.Y + padding)
                 );
             }
+        }
+        for (int i = 0; i < blockSpawnPlates.Length; i++)
+        {
+            blockSpawnPlates[i] = new PrimitiveBatch.Circle(
+                new Vector2(
+                    _backroundBlockPositions[0, 0].X  + _PLATERADIUS+ i * (_PLATERADIUS + 30),
+                    centreYPad
+                        + _backroundBlockPositions.GetLength(1) * (_BLOCKSIZE.Y + padding)
+                        + 60
+                ),
+                _PLATERADIUS,
+                Color.SkyBlue
+            );
         }
     }
 
@@ -280,6 +296,10 @@ public class Game1 : Game
                     );
                 }
             }
+        }
+        foreach (PrimitiveBatch.Circle circle in blockSpawnPlates)
+        {
+            circle.Draw(_spriteBatch, _primitiveBatch);
         }
     }
 

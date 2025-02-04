@@ -8,7 +8,7 @@ namespace BlockBlast
         public Vector2 position;
         public Vector2[] squarePositions;
         public bool[,] shape;
-        
+
         public bool isdragable = true;
         public Color color;
 
