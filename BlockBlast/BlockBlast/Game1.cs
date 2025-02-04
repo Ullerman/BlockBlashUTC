@@ -127,12 +127,11 @@ public class Game1 : Game
         BoardInitilizer(false, _PADDING);
         test.squarePositions = BuildBlock(test.position, L_Shape.shape);
 
-        if (_pickBlocks.All(ns => ns == null))
+        if (_pickBlocks.All(ns => ns == null)|| _pickBlocks.All(ns => !ns.isdragable))
         {
             _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
             _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
-            
 
             _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
@@ -141,6 +140,16 @@ public class Game1 : Game
                     _pickBlocks[i].position,
                     _pickBlocks[i].shape
                 );
+            }
+        }
+        
+        for (int i = 0; i < _pickBlocks.Length; i++)
+        {
+            if (!_pickBlocks[i].isdragable)
+            {
+                _boardBlocks.Add(_pickBlocks[i]);
+                // _pickBlocks[i] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
+
             }
         }
 
@@ -169,7 +178,7 @@ public class Game1 : Game
                 }
             }
         }
-        else if (_isDragging && mouseState.LeftButton == ButtonState.Pressed)
+        else if (_isDragging && mouseState.LeftButton == ButtonState.Pressed&& _pickBlocks[_draggingBlockIndex].isdragable)
         {
             _pickBlocks[_draggingBlockIndex].position += mouseDelta;
             _pickBlocks[_draggingBlockIndex].squarePositions = BuildBlock(
@@ -177,24 +186,17 @@ public class Game1 : Game
                 _pickBlocks[_draggingBlockIndex].shape
             );
         }
-        else if (_isDragging && mouseState.LeftButton == ButtonState.Released)
+        else if (
+            _isDragging
+            && mouseState.LeftButton == ButtonState.Released
+            
+        )
         {
             _isDragging = false;
+            LockToGrid(ref _pickBlocks[_draggingBlockIndex]);
         }
 
         _previousMousePosition = currentMousePosition;
-
-        if (!_isDragging)
-        {
-            LockToGrid(ref test);
-        }
-        for (int i = 0; i < _pickBlocks.Length; i++)
-        {
-            if (!_isDragging)
-            {
-                LockToGrid(ref _pickBlocks[i]);
-            }
-        }
 
         // TODO: Add your update logic here
 
@@ -256,35 +258,46 @@ public class Game1 : Game
     {
         Vector2[] newsquares = new Vector2[block.squarePositions.Length];
         byte sqrcheck = 0;
-        List<Vector2> sqrchecklist = new List<Vector2>();
         for (int i = 0; i < block.squarePositions.Length; i++)
         {
             Vector2 square = block.squarePositions[i];
-            for (int x = 0; x < _backroundBlockPositions.GetLength(0); x++)
+            foreach (Vector2 gridPosition in _backroundBlockPositions)
             {
-                for (int y = 0; y < _backroundBlockPositions.GetLength(1); y++)
+                if (
+                    Vector2.Distance(square, gridPosition) < 16
+                    && !IsPositionOccupied(gridPosition)
+                )
                 {
-                    Vector2 gridPosition = _backroundBlockPositions[x, y];
-                    if (Vector2.Distance(square, gridPosition) < 16 && !_board[x, y])
-                    {
-                        // Console.WriteLine($"Square: {square} Grid: {gridPosition}");
-                        newsquares[i] = gridPosition;
-                        sqrchecklist.Add(new Vector2(x, y));
-                        sqrcheck++;
-                        break;
-                    }
+                    newsquares[i] = gridPosition;
+                    sqrcheck++;
+                    break;
                 }
             }
         }
         if (sqrcheck == block.squarePositions.Length)
         {
             block.position = newsquares[0];
+            block.isdragable = false;
             block.squarePositions = newsquares;
-            foreach (Vector2 sqr in sqrchecklist)
+        }
+    }
+
+    private bool IsPositionOccupied(Vector2 position)
+    {
+        foreach (var block in _pickBlocks)
+        {
+            if (block != null)
             {
-                _board[(int)sqr.X, (int)sqr.Y] = true;
+                foreach (var square in block.squarePositions)
+                {
+                    if (square == position)
+                    {
+                        return true;
+                    }
+                }
             }
         }
+        return false;
     }
 
     private void PrintBoolArray(bool[,] array)
@@ -383,9 +396,14 @@ public class Game1 : Game
 
         DrawBackroundBoard();
         DrawBlock(test.squarePositions, Color.Red);
-        foreach (BlockLayout block in _pickBlocks)
+        foreach (BlockLayout block in _boardBlocks)
         {
             DrawBlock(BuildBlock(block.position, block.shape), block.color);
+        }
+        foreach (BlockLayout block in _pickBlocks)
+        {
+            if (block.isdragable)
+                DrawBlock(BuildBlock(block.position, block.shape), block.color);
         }
 
         _spriteBatch.End();
