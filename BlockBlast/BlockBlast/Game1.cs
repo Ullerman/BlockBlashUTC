@@ -145,17 +145,23 @@ public class Game1 : Game
     {
         Vector2[] newsquares = new Vector2[block.squarePositions.Length];
         byte sqrcheck = 0;
+        List<Vector2> sqrchecklist = new List<Vector2>();
         for (int i = 0; i < block.squarePositions.Length; i++)
         {
             Vector2 square = block.squarePositions[i];
-            foreach (Vector2 gridPosition in _backroundBlockPositions)
+            for (int x = 0; x < _backroundBlockPositions.GetLength(0); x++)
             {
-                if (Vector2.Distance(square, gridPosition) < 16)
+                for (int y = 0; y < _backroundBlockPositions.GetLength(1); y++)
                 {
-                    Console.WriteLine($"Square: {square} Grid: {gridPosition}");
-                    newsquares[i] = gridPosition;
-                    sqrcheck++;
-                    break;
+                    Vector2 gridPosition = _backroundBlockPositions[x, y];
+                    if (Vector2.Distance(square, gridPosition) < 16)
+                    {
+                        Console.WriteLine($"Square: {square} Grid: {gridPosition}");
+                        newsquares[i] = gridPosition;
+                        sqrchecklist.Add(new Vector2(x, y));
+                        sqrcheck++;
+                        break;
+                    }
                 }
             }
         }
@@ -163,6 +169,10 @@ public class Game1 : Game
         {
             block.position = newsquares[0];
             block.squarePositions = newsquares;
+            foreach (Vector2 sqr in sqrchecklist)
+            {
+                _board[(int)sqr.X, (int)sqr.Y] = true;
+            }
         }
     }
 
