@@ -132,6 +132,8 @@ public class Game1 : Game
             _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
             _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
+
+            _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
             {
                 _pickBlocks[i].squarePositions = BuildBlock(
@@ -198,6 +200,52 @@ public class Game1 : Game
         base.Update(gameTime);
     }
 
+    private void CheckForFullRow()
+    {
+        for (int i = 0; i < _board.GetLength(0); i++)
+        {
+            bool fullRow = true;
+            for (int j = 0; j < _board.GetLength(1); j++)
+            {
+                if (!_board[i, j])
+                {
+                    fullRow = false;
+                    break;
+                }
+            }
+            if (fullRow)
+            {
+                for (int j = 0; j < _board.GetLength(1); j++)
+                {
+                    _board[i, j] = false;
+                }
+            }
+        }
+    }
+
+    private void CheckForFullColumn()
+    {
+        for (int i = 0; i < _board.GetLength(1); i++)
+        {
+            bool fullColumn = true;
+            for (int j = 0; j < _board.GetLength(0); j++)
+            {
+                if (!_board[j, i])
+                {
+                    fullColumn = false;
+                    break;
+                }
+            }
+            if (fullColumn)
+            {
+                for (int j = 0; j < _board.GetLength(0); j++)
+                {
+                    _board[j, i] = false;
+                }
+            }
+        }
+    }
+
     private Color RandomColour()
     {
         return new Color(rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
@@ -216,9 +264,9 @@ public class Game1 : Game
                 for (int y = 0; y < _backroundBlockPositions.GetLength(1); y++)
                 {
                     Vector2 gridPosition = _backroundBlockPositions[x, y];
-                    if (Vector2.Distance(square, gridPosition) < 16)
+                    if (Vector2.Distance(square, gridPosition) < 16 && !_board[x, y])
                     {
-                        Console.WriteLine($"Square: {square} Grid: {gridPosition}");
+                        // Console.WriteLine($"Square: {square} Grid: {gridPosition}");
                         newsquares[i] = gridPosition;
                         sqrchecklist.Add(new Vector2(x, y));
                         sqrcheck++;
@@ -236,6 +284,21 @@ public class Game1 : Game
                 _board[(int)sqr.X, (int)sqr.Y] = true;
             }
         }
+    }
+
+    private void PrintBoolArray(bool[,] array)
+    {
+        string border = new string('-', array.GetLength(0));
+        Console.WriteLine(border);
+        for (int i = 0; i < array.GetLength(0); i++)
+        {
+            for (int j = 0; j < array.GetLength(1); j++)
+            {
+                Console.Write(array[i, j] ? "1" : "0");
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine(border);
     }
 
     private bool IsmouseOverRectangle(Vector2 position, Vector2 size, MouseState mouseState)
@@ -282,6 +345,8 @@ public class Game1 : Game
     private void DrawBackroundBoard()
     {
         Color backgroundBlockColor = new Color(32, 36, 69);
+        PrintBoolArray(_board);
+
         for (int i = 0; i < _board.GetLength(0); i++)
         {
             for (int j = 0; j < _board.GetLength(1); j++)
