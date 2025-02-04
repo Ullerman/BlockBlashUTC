@@ -31,7 +31,8 @@ public class Game1 : Game
     //blocks
     private BlockLayout test = new BlockLayout(new Vector2(0, 0), L_Shape.shape);
 
-    private List<BlockLayout> _blocks = new List<BlockLayout>();
+    private List<BlockLayout> _boardBlocks = new List<BlockLayout>();
+    private BlockLayout[] _pickBlocks = new BlockLayout[3];
 
     private Vector2[,] _backroundBlockPositions = new Vector2[8, 8];
 
@@ -209,7 +210,13 @@ public class Game1 : Game
     {
         foreach (Vector2 square in block)
         {
-            _spriteBatch.Draw(_backgroundBlockTexture, square, color);
+            _spriteBatch.Draw(
+                _blockTexture,
+                
+                
+                new Rectangle((int)square.X,(int)square.Y, (int)_BLOCKSIZE.X, (int)_BLOCKSIZE.Y),
+                color
+            );
         }
     }
 
@@ -222,7 +229,11 @@ public class Game1 : Game
             {
                 if (_board[i, j])
                 {
-                    _spriteBatch.Draw(_blockTexture, new Vector2(i, j), backgroundBlockColor);
+                    _spriteBatch.Draw(
+                        _backgroundBlockTexture,
+                        _backroundBlockPositions[i, j],
+                        Color.White
+                    );
                 }
                 else
                 {
