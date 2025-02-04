@@ -132,6 +132,7 @@ public class Game1 : Game
             _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
             _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
+            
 
             _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
