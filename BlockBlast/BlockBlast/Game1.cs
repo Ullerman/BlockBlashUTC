@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading;
 using Microsoft.Xna.Framework;
@@ -29,7 +30,7 @@ public class Game1 : Game
     private bool[,] _board = new bool[8, 8];
 
     //blocks
-    private BlockLayout test = new BlockLayout(new Vector2(0, 0), L_Shape.shape);
+    private BlockLayout test = new BlockLayout(new Vector2(0, 0), L_Shape.shape, Color.Red);
 
     private List<BlockLayout> _boardBlocks = new List<BlockLayout>();
     private BlockLayout[] _pickBlocks = new BlockLayout[3];
@@ -40,6 +41,7 @@ public class Game1 : Game
 
     private Vector2 _previousMousePosition;
     private bool _isDragging = false;
+    Random rnd = new Random();
 
     public Game1()
     {
@@ -103,35 +105,37 @@ public class Game1 : Game
             Exit();
         MouseState mouseState = Mouse.GetState();
         Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
+        Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
 
         BoardInitilizer(false, _PADDING);
         test.squarePositions = BuildBlock(test.position, L_Shape.shape);
-
-        if (mouseState.LeftButton == ButtonState.Pressed)
+        if (_pickBlocks.All(ns => ns == null))
         {
-            if (!_isDragging)
+            _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
+            _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
+            _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
+        }
+        if (!_isDragging && mouseState.LeftButton == ButtonState.Pressed)
+        {
+            for (int i = 0; i < _pickBlocks.Length; i++)
             {
-                for (int i = 0; i < test.squarePositions.Length; i++)
+                if (IsmouseOverRectangle(_pickBlocks[i].position, _BLOCKSIZE, mouseState))
                 {
-                    Vector2 square = test.squarePositions[i];
-                    if (IsmouseOverRectangle(square, _BLOCKSIZE, mouseState))
-                    {
-                        _isDragging = true;
-                        break;
-                    }
+                    _isDragging = true;
+                    _pickBlocks[i].position += mouseDelta;
+                    break;
                 }
-            }
-            else
-            {
-                Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
-                test.position += mouseDelta;
             }
         }
         else
         {
-            _isDragging = false;
+            if (_isDragging && mouseState.LeftButton == ButtonState.Released)
+            {
+                _isDragging = false;
+            }
         }
         _previousMousePosition = currentMousePosition;
+
         if (!_isDragging)
         {
             LockToGrid(ref test);
@@ -140,6 +144,11 @@ public class Game1 : Game
         // TODO: Add your update logic here
 
         base.Update(gameTime);
+    }
+
+    private Color RandomColour()
+    {
+        return new Color(rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
     }
 
     private void LockToGrid(ref BlockLayout block)
@@ -212,9 +221,7 @@ public class Game1 : Game
         {
             _spriteBatch.Draw(
                 _blockTexture,
-                
-                
-                new Rectangle((int)square.X,(int)square.Y, (int)_BLOCKSIZE.X, (int)_BLOCKSIZE.Y),
+                new Rectangle((int)square.X, (int)square.Y, (int)_BLOCKSIZE.X, (int)_BLOCKSIZE.Y),
                 color
             );
         }
@@ -254,6 +261,10 @@ public class Game1 : Game
 
         DrawBackroundBoard();
         DrawBlock(test.squarePositions, Color.Red);
+        foreach (BlockLayout block in _pickBlocks)
+        {
+            DrawBlock(BuildBlock(block.position, block.shape), block.color);
+        }
 
         _spriteBatch.End();
         base.Draw(gameTime);

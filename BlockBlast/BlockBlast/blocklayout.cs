@@ -10,11 +10,13 @@ namespace BlockBlast
         public bool[,] shape;
         
         public bool isdragable = true;
+        public Color color;
 
-        public BlockLayout(Vector2 position, bool[,] shape)
+        public BlockLayout(Vector2 position, bool[,] shape, Color color)
         {
             this.position = position;
             this.shape = shape;
+            this.color = color;
         }
         //position is currently taken from the upper left corner of the shape
     }
