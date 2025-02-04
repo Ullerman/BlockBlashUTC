@@ -41,6 +41,7 @@ public class Game1 : Game
 
     private Vector2 _previousMousePosition;
     private bool _isDragging = false;
+    private int _draggingBlockIndex = -1;
     Random rnd = new Random();
 
     public Game1()
@@ -109,36 +110,64 @@ public class Game1 : Game
 
         BoardInitilizer(false, _PADDING);
         test.squarePositions = BuildBlock(test.position, L_Shape.shape);
+
         if (_pickBlocks.All(ns => ns == null))
         {
             _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
             _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
+            for (int i = 0; i < _pickBlocks.Length; i++)
+            {
+                _pickBlocks[i].squarePositions = BuildBlock(
+                    _pickBlocks[i].position,
+                    _pickBlocks[i].shape
+                );
+            }
+            // _pickBlocks[i].squarePositions = BuildBlock(_pickBlocks[i].position, _pickBlocks[i].shape);
         }
         if (!_isDragging && mouseState.LeftButton == ButtonState.Pressed)
         {
             for (int i = 0; i < _pickBlocks.Length; i++)
             {
-                if (IsmouseOverRectangle(_pickBlocks[i].position, _BLOCKSIZE, mouseState))
+                _pickBlocks[i].squarePositions = BuildBlock(
+                    _pickBlocks[i].position,
+                    _pickBlocks[i].shape
+                );
+                for (int j = 0; j < _pickBlocks[i].squarePositions.Length; j++)
                 {
-                    _isDragging = true;
-                    _pickBlocks[i].position += mouseDelta;
-                    break;
+                    if (
+                        IsmouseOverRectangle(
+                            _pickBlocks[i].squarePositions[j],
+                            _BLOCKSIZE,
+                            mouseState
+                        )
+                    )
+                    {
+                        _isDragging = true;
+                        _draggingBlockIndex = i;
+                        break;
+                    }
                 }
             }
         }
-        else
+        else if (_isDragging && mouseState.LeftButton == ButtonState.Pressed)
         {
-            if (_isDragging && mouseState.LeftButton == ButtonState.Released)
-            {
-                _isDragging = false;
-            }
+            _pickBlocks[_draggingBlockIndex].position += mouseDelta;
         }
+        else if (_isDragging && mouseState.LeftButton == ButtonState.Released)
+        {
+            _isDragging = false;
+        }
+
         _previousMousePosition = currentMousePosition;
 
         if (!_isDragging)
         {
             LockToGrid(ref test);
+            for (int i = 0; i < _pickBlocks.Length; i++)
+            {
+                LockToGrid(ref _pickBlocks[i]);
+            }
         }
 
         // TODO: Add your update logic here
