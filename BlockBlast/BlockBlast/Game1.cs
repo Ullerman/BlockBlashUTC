@@ -28,9 +28,17 @@ public class Game1 : Game
     private bool[,] _board = new bool[8, 8];
 
     //blocks
-    private BlockLayout.L_Shape test = new BlockLayout.L_Shape();
+    private BlockLayout test = new BlockLayout(new Vector2(0, 0), L_Shape.shape);
+
+    private List<BlockLayout> _blocks = new List<BlockLayout>();
+
 
     private Vector2[,] _backroundBlockPosition = new Vector2[8, 8];
+
+    //general control dataa
+
+    private Vector2 _previousMousePosition;
+    private bool _isDragging = false;
 
     public Game1()
     {
@@ -93,18 +101,56 @@ public class Game1 : Game
         )
             Exit();
         MouseState mouseState = Mouse.GetState();
+        Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
 
         BoardInitilizer(false, _PADDING);
+        test.squarePositions = BuildBlock(test.position, L_Shape.shape);
 
-        test.squarePositions = BuildBlock(test.position, BlockLayout.L_Shape.shape);
+        if (mouseState.LeftButton == ButtonState.Pressed)
+        {
+            if (!_isDragging)
+            {
+                for (int i = 0; i < test.squarePositions.Length; i++)
+                {
+                    Vector2 square = test.squarePositions[i];
+                    if (IsmouseOverRectangle(square, _BLOCKSIZE, mouseState))
+                    {
+                        _isDragging = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
+                test.position += mouseDelta;
+            }
+        }
+        else
+        {
+            _isDragging = false;
+        }
+        _previousMousePosition = currentMousePosition;
+
+        
 
         // TODO: Add your update logic here
 
         base.Update(gameTime);
     }
-    private bool IsmouseOverRectangle(Vector2 position, Vector2 size)
+    private void LockToGrid(ref BlockLayout block)
     {
-        MouseState mouseState = Mouse.GetState();
+        for (int i = 0; i < block.squarePositions.Length; i++)
+        {
+            Vector2 square = block.squarePositions[i];
+    
+            // block.position = gridPosition * (_BLOCKSIZE + _PADDING);
+        }
+
+    }
+
+    private bool IsmouseOverRectangle(Vector2 position, Vector2 size, MouseState mouseState)
+    {
         return (
             mouseState.X > position.X
             && mouseState.X < position.X + size.X
