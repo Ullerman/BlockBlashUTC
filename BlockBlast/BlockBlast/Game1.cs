@@ -84,7 +84,7 @@ public class Game1 : Game
         {
             blockSpawnPlates[i] = new PrimitiveBatch.Circle(
                 new Vector2(
-                    _backroundBlockPositions[0, 0].X  + _PLATERADIUS+ i * (_PLATERADIUS + 30),
+                    _backroundBlockPositions[0, 0].X + _PLATERADIUS + i * (_PLATERADIUS + 30),
                     centreYPad
                         + _backroundBlockPositions.GetLength(1) * (_BLOCKSIZE.Y + padding)
                         + 60
@@ -139,8 +139,8 @@ public class Game1 : Game
                     _pickBlocks[i].shape
                 );
             }
-            // _pickBlocks[i].squarePositions = BuildBlock(_pickBlocks[i].position, _pickBlocks[i].shape);
         }
+
         if (!_isDragging && mouseState.LeftButton == ButtonState.Pressed)
         {
             for (int i = 0; i < _pickBlocks.Length; i++)
@@ -169,6 +169,10 @@ public class Game1 : Game
         else if (_isDragging && mouseState.LeftButton == ButtonState.Pressed)
         {
             _pickBlocks[_draggingBlockIndex].position += mouseDelta;
+            _pickBlocks[_draggingBlockIndex].squarePositions = BuildBlock(
+                _pickBlocks[_draggingBlockIndex].position,
+                _pickBlocks[_draggingBlockIndex].shape
+            );
         }
         else if (_isDragging && mouseState.LeftButton == ButtonState.Released)
         {
@@ -180,7 +184,10 @@ public class Game1 : Game
         if (!_isDragging)
         {
             LockToGrid(ref test);
-            for (int i = 0; i < _pickBlocks.Length; i++)
+        }
+        for (int i = 0; i < _pickBlocks.Length; i++)
+        {
+            if (!_isDragging)
             {
                 LockToGrid(ref _pickBlocks[i]);
             }
