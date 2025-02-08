@@ -104,7 +104,7 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _primitiveBatch = new PrimitiveBatch(GraphicsDevice);
-        var rectangleTexture = new RectangleTexture();
+        RectangleTexture rectangleTexture = new RectangleTexture();
 
         //Textures
         _blockTexture = Content.Load<Texture2D>("block");
@@ -130,7 +130,7 @@ public class Game1 : Game
             _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
             _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
 
-            _pickBlocks[2].shape[2, 0] = false;
+            // _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
             {
                 _pickBlocks[i].squarePositions = BuildBlock(
@@ -181,6 +181,10 @@ public class Game1 : Game
                         break;
                     }
                 }
+                // if (!_pickBlocks[i].isdragable)
+                // {
+                //     _pickBlocks[i] = null;
+                // }
             }
         }
         else if (
@@ -339,8 +343,7 @@ public class Game1 : Game
             block.isdragable = false;
             block.squarePositions = newsquares;
 
-            // Update the board state for this block.
-            foreach (var square in block.squarePositions)
+            foreach (Vector2 square in block.squarePositions)
             {
                 for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
                 {
@@ -348,17 +351,15 @@ public class Game1 : Game
                     {
                         if (_backroundBlockPositions[i, j] == square)
                         {
-                            _board[i, j] = true; // Mark as occupied
+                            _board[i, j] = true;
                             break;
                         }
                     }
                 }
             }
 
-            // Add the squares to _boardBlocks only once
-            foreach (var square in block.squarePositions)
+            foreach (Vector2 square in block.squarePositions)
             {
-                // Optionally check if not already present.
                 if (!_boardBlocks.Any(s => s.position == square))
                 {
                     _boardBlocks.Add(new Square(square, block.color));
@@ -377,20 +378,42 @@ public class Game1 : Game
             }
         }
 
-        foreach (var block in _pickBlocks)
+        foreach (BlockLayout block in _pickBlocks)
         {
             if (block != null && !block.isdragable)
             {
-                foreach (var square in block.squarePositions)
+                foreach (Vector2 square in block.squarePositions)
                 {
-                    if (square == position)
+                    int row,
+                        col;
+                    if (TryGetGridIndex(square, out row, out col) && _board[row, col])
                     {
-                        return true;
+                        if (square == position)
+                            return true;
                     }
                 }
             }
         }
 
+        return false;
+    }
+
+    private bool TryGetGridIndex(Vector2 position, out int row, out int col)
+    {
+        for (int r = 0; r < _backroundBlockPositions.GetLength(0); r++)
+        {
+            for (int c = 0; c < _backroundBlockPositions.GetLength(1); c++)
+            {
+                if (Vector2.Distance(_backroundBlockPositions[r, c], position) < 16)
+                {
+                    row = r;
+                    col = c;
+                    return true;
+                }
+            }
+        }
+        row = -1;
+        col = -1;
         return false;
     }
 
