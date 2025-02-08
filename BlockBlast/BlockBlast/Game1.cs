@@ -148,7 +148,12 @@ public class Game1 : Game
         {
             if (!_pickBlocks[i].isdragable)
             {
-                _boardBlocks.Add(new Square(_pickBlocks[i].position, _pickBlocks[i].color));
+                for (int j = 0; j < _pickBlocks[i].squarePositions.Length; j++)
+                {
+                    _boardBlocks.Add(
+                        new Square(_pickBlocks[i].squarePositions[j], _pickBlocks[i].color)
+                    );
+                }
                 // _pickBlocks[i] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             }
         }
@@ -220,46 +225,83 @@ public class Game1 : Game
 
     private void CheckForFullRow()
     {
-        for (int i = 0; i < _board.GetLength(0); i++)
+        for (int row = 0; row < _board.GetLength(0); row++)
         {
             bool fullRow = true;
-            for (int j = 0; j < _board.GetLength(1); j++)
+            for (int col = 0; col < _board.GetLength(1); col++)
             {
-                if (!_board[i, j])
+                if (!_board[row, col])
                 {
                     fullRow = false;
                     break;
                 }
             }
+
             if (fullRow)
             {
-                for (int j = 0; j < _board.GetLength(1); j++)
+                // Clear the row in the board
+                for (int col = 0; col < _board.GetLength(1); col++)
                 {
-                    _board[i, j] = false;
+                    _board[row, col] = false;
                 }
+
+                // Remove blocks in this row from _boardBlocks
+                _boardBlocks.RemoveAll(block =>
+                {
+                    for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
+                        {
+                            if (_backroundBlockPositions[i, j] == block.position && i == row)
+                            {
+                                return true; // Mark this block for removal
+                            }
+                        }
+                    }
+
+                    return false;
+                });
             }
         }
     }
 
     private void CheckForFullColumn()
     {
-        for (int i = 0; i < _board.GetLength(1); i++)
+        for (int col = 0; col < _board.GetLength(1); col++)
         {
             bool fullColumn = true;
-            for (int j = 0; j < _board.GetLength(0); j++)
+            for (int row = 0; row < _board.GetLength(0); row++)
             {
-                if (!_board[j, i])
+                if (!_board[row, col])
                 {
                     fullColumn = false;
                     break;
                 }
             }
+
             if (fullColumn)
             {
-                for (int j = 0; j < _board.GetLength(0); j++)
+                // Clear the column in the board
+                for (int row = 0; row < _board.GetLength(0); row++)
                 {
-                    _board[j, i] = false;
+                    _board[row, col] = false;
                 }
+
+                _boardBlocks.RemoveAll(block =>
+                {
+                    for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
+                        {
+                            if (_backroundBlockPositions[i, j] == block.position && j == col)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+                });
             }
         }
     }
@@ -273,6 +315,7 @@ public class Game1 : Game
     {
         Vector2[] newsquares = new Vector2[block.squarePositions.Length];
         byte sqrcheck = 0;
+
         for (int i = 0; i < block.squarePositions.Length; i++)
         {
             Vector2 square = block.squarePositions[i];
@@ -289,21 +332,36 @@ public class Game1 : Game
                 }
             }
         }
+
         if (sqrcheck == block.squarePositions.Length)
         {
             block.position = newsquares[0];
             block.isdragable = false;
             block.squarePositions = newsquares;
 
-            // Update _board: mark each corresponding grid cell as occupied.
-            for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
+            // Update the board state for this block.
+            foreach (var square in block.squarePositions)
             {
-                for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
+                for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
                 {
-                    if (newsquares.Contains(_backroundBlockPositions[i, j]))
+                    for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
                     {
-                        _board[i, j] = true;
+                        if (_backroundBlockPositions[i, j] == square)
+                        {
+                            _board[i, j] = true; // Mark as occupied
+                            break;
+                        }
                     }
+                }
+            }
+
+            // Add the squares to _boardBlocks only once
+            foreach (var square in block.squarePositions)
+            {
+                // Optionally check if not already present.
+                if (!_boardBlocks.Any(s => s.position == square))
+                {
+                    _boardBlocks.Add(new Square(square, block.color));
                 }
             }
         }
