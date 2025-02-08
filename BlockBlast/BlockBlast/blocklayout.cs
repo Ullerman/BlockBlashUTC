@@ -21,6 +21,19 @@ namespace BlockBlast
         //position is currently taken from the upper left corner of the shape
     }
 
+    public class Square
+    {
+        public Vector2 position;
+        public Color color;
+        public bool isdragable = true;
+
+        public Square(Vector2 position, Color color)
+        {
+            this.position = position;
+            this.color = color;
+        }
+    }
+
     public class L_Shape
     {
         public static readonly bool[,] shape = new bool[,]

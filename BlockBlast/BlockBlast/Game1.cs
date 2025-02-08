@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,11 +31,10 @@ public class Game1 : Game
     //blocks
     private BlockLayout test = new BlockLayout(new Vector2(0, 0), L_Shape.shape, Color.Red);
 
-    private List<BlockLayout> _boardBlocks = new List<BlockLayout>();
+    private List<Square> _boardBlocks = new List<Square>();
     private BlockLayout[] _pickBlocks = new BlockLayout[3];
 
     private Vector2[,] _backroundBlockPositions = new Vector2[8, 8];
-
     private PrimitiveBatch.Circle[] blockSpawnPlates = new PrimitiveBatch.Circle[3];
 
     //general control dataa
@@ -99,6 +96,7 @@ public class Game1 : Game
     {
         //Board Data
         test.position = new Vector2(0, 0);
+        BoardInitilizer(false, _PADDING);
         base.Initialize();
     }
 
@@ -124,10 +122,9 @@ public class Game1 : Game
         Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
         Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
 
-        BoardInitilizer(false, _PADDING);
         test.squarePositions = BuildBlock(test.position, L_Shape.shape);
 
-        if (_pickBlocks.All(ns => ns == null)|| _pickBlocks.All(ns => !ns.isdragable))
+        if (_pickBlocks.All(ns => ns == null) || _pickBlocks.All(ns => !ns.isdragable))
         {
             _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
@@ -141,15 +138,18 @@ public class Game1 : Game
                     _pickBlocks[i].shape
                 );
             }
+            _pickBlocks[1].squarePositions = BuildBlock(
+                _pickBlocks[1].position,
+                _pickBlocks[1].shape
+            );
         }
-        
+
         for (int i = 0; i < _pickBlocks.Length; i++)
         {
             if (!_pickBlocks[i].isdragable)
             {
-                _boardBlocks.Add(_pickBlocks[i]);
+                _boardBlocks.Add(new Square(_pickBlocks[i].position, _pickBlocks[i].color));
                 // _pickBlocks[i] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
-
             }
         }
 
@@ -178,7 +178,11 @@ public class Game1 : Game
                 }
             }
         }
-        else if (_isDragging && mouseState.LeftButton == ButtonState.Pressed&& _pickBlocks[_draggingBlockIndex].isdragable)
+        else if (
+            _isDragging
+            && mouseState.LeftButton == ButtonState.Pressed
+            && _pickBlocks[_draggingBlockIndex].isdragable
+        )
         {
             _pickBlocks[_draggingBlockIndex].position += mouseDelta;
             _pickBlocks[_draggingBlockIndex].squarePositions = BuildBlock(
@@ -186,17 +190,28 @@ public class Game1 : Game
                 _pickBlocks[_draggingBlockIndex].shape
             );
         }
-        else if (
-            _isDragging
-            && mouseState.LeftButton == ButtonState.Released
-            
-        )
+        else if (_isDragging && mouseState.LeftButton == ButtonState.Released)
         {
             _isDragging = false;
             LockToGrid(ref _pickBlocks[_draggingBlockIndex]);
         }
 
         _previousMousePosition = currentMousePosition;
+
+        CheckForFullRow();
+        CheckForFullColumn();
+        for (int i = 0; i < _board.GetLength(0); i++)
+        {
+            for (int j = 0; j < _board.GetLength(1); j++)
+            {
+                if (!_board[i, j])
+                {
+                    _boardBlocks.RemoveAll(block =>
+                        block.position == _backroundBlockPositions[i, j]
+                    );
+                }
+            }
+        }
 
         // TODO: Add your update logic here
 
@@ -279,14 +294,34 @@ public class Game1 : Game
             block.position = newsquares[0];
             block.isdragable = false;
             block.squarePositions = newsquares;
+
+            // Update _board: mark each corresponding grid cell as occupied.
+            for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
+            {
+                for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
+                {
+                    if (newsquares.Contains(_backroundBlockPositions[i, j]))
+                    {
+                        _board[i, j] = true;
+                    }
+                }
+            }
         }
     }
 
     private bool IsPositionOccupied(Vector2 position)
     {
+        foreach (Square block in _boardBlocks)
+        {
+            if (block.position == position)
+            {
+                return true;
+            }
+        }
+
         foreach (var block in _pickBlocks)
         {
-            if (block != null)
+            if (block != null && !block.isdragable)
             {
                 foreach (var square in block.squarePositions)
                 {
@@ -297,6 +332,7 @@ public class Game1 : Game
                 }
             }
         }
+
         return false;
     }
 
@@ -342,6 +378,23 @@ public class Game1 : Game
             }
         }
         return block.ToArray();
+    }
+
+    private void DrawSquares(List<Square> squares)
+    {
+        foreach (Square square in squares)
+        {
+            _spriteBatch.Draw(
+                _blockTexture,
+                new Rectangle(
+                    (int)square.position.X,
+                    (int)square.position.Y,
+                    (int)_BLOCKSIZE.X,
+                    (int)_BLOCKSIZE.Y
+                ),
+                square.color
+            );
+        }
     }
 
     private void DrawBlock(Vector2[] block, Color color)
@@ -395,11 +448,10 @@ public class Game1 : Game
         _spriteBatch.Begin();
 
         DrawBackroundBoard();
-        DrawBlock(test.squarePositions, Color.Red);
-        foreach (BlockLayout block in _boardBlocks)
-        {
-            DrawBlock(BuildBlock(block.position, block.shape), block.color);
-        }
+        // DrawBlock(test.squarePositions, Color.Red);
+
+        DrawSquares(_boardBlocks);
+
         foreach (BlockLayout block in _pickBlocks)
         {
             if (block.isdragable)
