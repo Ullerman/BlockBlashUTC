@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Vector;
+using VectorGraphics;
 
 namespace BlockBlast;
 
@@ -22,14 +21,14 @@ public class Game1 : Game
 
     //Texture Data
     private Vector2 _BLOCKSIZE = new Vector2(50);
-    private const float _PLATERADIUS = 100;
+    private const float _PLATERADIUS = 200;
     private const float _PADDING = 5;
 
     //Board Data
     private bool[,] _board = new bool[8, 8];
 
     //blocks
-    private BlockLayout test = new BlockLayout(new Vector2(0, 0), L_Shape.shape, Color.Red);
+
 
     private List<Square> _boardBlocks = new List<Square>();
     private BlockLayout[] _pickBlocks = new BlockLayout[3];
@@ -50,26 +49,26 @@ public class Game1 : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
-        _graphics.PreferredBackBufferWidth = 600;
+        _graphics.PreferredBackBufferWidth = 620;
         _graphics.PreferredBackBufferHeight = 800;
     }
 
     private void BoardInitilizer(bool value, float padding)
     {
-        for (int i = 0; i < _board.GetLength(0); i++)
+        int boardWidth = _backroundBlockPositions.GetLength(0);
+        int boardHeight = _backroundBlockPositions.GetLength(1);
+
+        // Calculate board size
+        float totalBoardWidth = (boardWidth * _BLOCKSIZE.X) + ((boardWidth - 1) * padding);
+        float totalBoardHeight = (boardHeight * _BLOCKSIZE.Y) + ((boardHeight - 1) * padding);
+
+        // Center the board horizontally and position it towards the top
+        float centreXPad = (Window.ClientBounds.Width - totalBoardWidth) * 0.25f;
+        float centreYPad = Window.ClientBounds.Height * 0.1f; // Adjust as needed
+
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int j = 0; j < _board.GetLength(1); j++)
-            {
-                _board[i, j] = value;
-            }
-        }
-        float centreXPad =
-            Window.ClientBounds.Width / 2
-            - (_BLOCKSIZE.X + padding) * _backroundBlockPositions.GetLength(0) / 2;
-        float centreYPad = Window.ClientBounds.Height * 0.1f;
-        for (int x = 0; x < _backroundBlockPositions.GetLength(0); x++)
-        {
-            for (int y = 0; y < _backroundBlockPositions.GetLength(1); y++)
+            for (int y = 0; y < boardHeight; y++)
             {
                 _backroundBlockPositions[y, x] = new Vector2(
                     centreXPad + x * (_BLOCKSIZE.X + padding),
@@ -77,14 +76,19 @@ public class Game1 : Game
                 );
             }
         }
-        for (int i = 0; i < blockSpawnPlates.Length; i++)
+
+        // Plate positioning
+        int plateCount = blockSpawnPlates.Length;
+        float totalPlatesWidth = (plateCount * (_PLATERADIUS * 2)) + ((plateCount - 1) * 5);
+        float platesStartX = _PLATERADIUS / 2 + 5;
+        float platesY = centreYPad + totalBoardHeight + 110;
+
+        for (int i = 0; i < plateCount; i++)
         {
             blockSpawnPlates[i] = new PrimitiveBatch.Circle(
                 new Vector2(
-                    _backroundBlockPositions[0, 0].X + _PLATERADIUS + i * (_PLATERADIUS + 30),
-                    centreYPad
-                        + _backroundBlockPositions.GetLength(1) * (_BLOCKSIZE.Y + padding)
-                        + 60
+                    platesStartX + i * (_PLATERADIUS + 5), // Adjust spacing here
+                    platesY
                 ),
                 _PLATERADIUS,
                 Color.SkyBlue
@@ -94,9 +98,8 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        //Board Data
-        test.position = new Vector2(0, 0);
         BoardInitilizer(false, _PADDING);
+
         base.Initialize();
     }
 
@@ -122,13 +125,25 @@ public class Game1 : Game
         Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
         Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
 
-        test.squarePositions = BuildBlock(test.position, L_Shape.shape);
+        // test.squarePositions = BuildBlock(test.position, Shapes.GetRandomShapeandRotation(rnd));
 
         if (_pickBlocks.All(ns => ns == null) || _pickBlocks.All(ns => !ns.isdragable))
         {
-            _pickBlocks[0] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
-            _pickBlocks[1] = new BlockLayout(new Vector2(0, 0), T_Shape.shape, RandomColour());
-            _pickBlocks[2] = new BlockLayout(new Vector2(0, 0), i_Shape.shape, RandomColour());
+            _pickBlocks[0] = new BlockLayout(
+                new Vector2(0, 0),
+                Shapes.GetRandomShapeandRotation(rnd),
+                RandomColour()
+            );
+            _pickBlocks[1] = new BlockLayout(
+                new Vector2(0, 0),
+                Shapes.GetRandomShapeandRotation(rnd),
+                RandomColour()
+            );
+            _pickBlocks[2] = new BlockLayout(
+                new Vector2(0, 0),
+                Shapes.GetRandomShapeandRotation(rnd),
+                RandomColour()
+            );
 
             // _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
@@ -136,6 +151,10 @@ public class Game1 : Game
                 _pickBlocks[i].squarePositions = BuildBlock(
                     _pickBlocks[i].position,
                     _pickBlocks[i].shape
+                );
+                _pickBlocks[i].position = new Vector2(
+                    blockSpawnPlates[i].Position.X - _PLATERADIUS / 2 + 20,
+                    blockSpawnPlates[i].Position.Y - _PLATERADIUS / 2 + 20
                 );
             }
             _pickBlocks[1].squarePositions = BuildBlock(

@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace BlockBlast
@@ -34,54 +37,81 @@ namespace BlockBlast
         }
     }
 
-    public class L_Shape
+    public class Shapes
     {
-        public static readonly bool[,] shape = new bool[,]
+        public static Dictionary<string, bool[,]> shapes = new Dictionary<string, bool[,]>
         {
-            { true, false },
-            { true, false },
-            { true, true },
+            {
+                "L",
+                new bool[,]
+                {
+                    { true, false },
+                    { true, false },
+                    { true, true },
+                }
+            },
+            {
+                "T",
+                new bool[,]
+                {
+                    { true, true, true },
+                    { false, true, false },
+                    { false, true, false },
+                }
+            },
+            {
+                "I",
+                new bool[,]
+                {
+                    { true },
+                    { true },
+                    { true },
+                    { true },
+                }
+            },
+            {
+                "O",
+                new bool[,]
+                {
+                    { true, true },
+                    { true, true },
+                }
+            },
+            {
+                "S",
+                new bool[,]
+                {
+                    { false, true, true },
+                    { true, true, false },
+                }
+            },
         };
-
-        public L_Shape() { }
-    }
-
-    class T_Shape
-    {
-        public static readonly bool[,] shape = new bool[,]
+        public static bool[,] RotateShape(bool[,] matrix)
         {
-            { true, true, true },
-            { false, true, false },
-            { false, true, false },
-        };
-    }
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            bool[,] rotated = new bool[cols, rows];
 
-    class i_Shape
-    {
-        public static readonly bool[,] shape = new bool[,]
-        {
-            { true },
-            { true },
-            { true },
-            { true },
-        };
-    }
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    rotated[j, rows - 1 - i] = matrix[i, j];
+                }
+            }
+            return rotated;
+        }
 
-    class O_Shape
-    {
-        public static readonly bool[,] shape = new bool[,]
+        public static bool[,] GetRandomShapeandRotation(Random rnd)
         {
-            { true, true },
-            { true, true },
-        };
-    }
-
-    class S_Shape
-    {
-        public static readonly bool[,] shape = new bool[,]
-        {
-            { false, true, true },
-            { true, true, false },
-        };
+            string randomKey = shapes.Keys.ElementAt(rnd.Next(shapes.Count));
+            bool[,] shape = shapes[randomKey];
+            int rotations = rnd.Next(4);
+            for (int i = 0; i < rotations; i++)
+            {
+                shape = RotateShape(shape);
+            }
+            return shape;
+        }
     }
 }
