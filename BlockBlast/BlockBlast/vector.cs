@@ -2,7 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Vector
+namespace VectorGraphics
 {
     public class PrimitiveBatch
     {
@@ -21,7 +21,7 @@ namespace Vector
             WhitePixel = new Texture2D(graphicsDevice, 1, 1);
             WhitePixel.SetData(new[] { Color.White });
 
-            int diameter = 100;
+            int diameter = 1000;
             WhiteCircle = new Texture2D(graphicsDevice, diameter, diameter);
             Color[] colorData = new Color[diameter * diameter];
 
