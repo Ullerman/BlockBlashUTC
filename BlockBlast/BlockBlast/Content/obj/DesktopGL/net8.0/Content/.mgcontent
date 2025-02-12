@@ -4,7 +4,7 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/block.png</File>
+    <File>C:/Users/Leon/Source/Repos/Ullerman/BlockBlashUTC/BlockBlast/BlockBlast/Content/block.png</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />

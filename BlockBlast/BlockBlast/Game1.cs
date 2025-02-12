@@ -14,8 +14,8 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
 
     private PrimitiveBatch _primitiveBatch;
-
     //Textures
+
     private Texture2D _blockTexture;
     private Texture2D _backgroundBlockTexture;
 
@@ -120,7 +120,7 @@ public class Game1 : Game
             GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
             || Keyboard.GetState().IsKeyDown(Keys.Escape)
         )
-            Exit();
+            Exit();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
         MouseState mouseState = Mouse.GetState();
         Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
         Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
@@ -165,13 +165,14 @@ public class Game1 : Game
 
         for (int i = 0; i < _pickBlocks.Length; i++)
         {
-            if (!_pickBlocks[i].isdragable)
+            if (!_pickBlocks[i].isdragable && !_pickBlocks[i].isPlaced)
             {
                 for (int j = 0; j < _pickBlocks[i].squarePositions.Length; j++)
                 {
                     _boardBlocks.Add(
                         new Square(_pickBlocks[i].squarePositions[j], _pickBlocks[i].color)
                     );
+                    _pickBlocks[i].isPlaced = true;
                 }
                 // _pickBlocks[i] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             }
@@ -246,29 +247,31 @@ public class Game1 : Game
         base.Update(gameTime);
     }
 
-    private void CheckForFullRow()
+    private int CheckForFullRow()
     {
+        int fullRows = 0;
         for (int row = 0; row < _board.GetLength(0); row++)
         {
             bool fullRow = true;
             for (int col = 0; col < _board.GetLength(1); col++)
             {
+                    fullRow = false;
                 if (!_board[row, col])
                 {
-                    fullRow = false;
                     break;
                 }
             }
 
             if (fullRow)
             {
-                // Clear the row in the board
+                fullRows += 1;
+                
                 for (int col = 0; col < _board.GetLength(1); col++)
                 {
                     _board[row, col] = false;
                 }
 
-                // Remove blocks in this row from _boardBlocks
+   
                 _boardBlocks.RemoveAll(block =>
                 {
                     for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
@@ -277,7 +280,7 @@ public class Game1 : Game
                         {
                             if (_backroundBlockPositions[i, j] == block.position && i == row)
                             {
-                                return true; // Mark this block for removal
+                                return true; 
                             }
                         }
                     }
@@ -285,11 +288,14 @@ public class Game1 : Game
                     return false;
                 });
             }
+            
         }
+        return fullRows;
     }
 
-    private void CheckForFullColumn()
+    private int CheckForFullColumn()
     {
+        int fullColumns = 0;
         for (int col = 0; col < _board.GetLength(1); col++)
         {
             bool fullColumn = true;
@@ -304,6 +310,7 @@ public class Game1 : Game
 
             if (fullColumn)
             {
+                fullColumns += 1;
                 // Clear the column in the board
                 for (int row = 0; row < _board.GetLength(0); row++)
                 {
@@ -327,6 +334,7 @@ public class Game1 : Game
                 });
             }
         }
+        return fullColumns;
     }
 
     private Color RandomColour()
@@ -551,6 +559,10 @@ public class Game1 : Game
         // DrawBlock(test.squarePositions, Color.Red);
 
         DrawSquares(_boardBlocks);
+        if (_boardBlocks.Count > 100)
+        {
+            throw new Exception("_boardBlocks is too long");
+        }
 
         foreach (BlockLayout block in _pickBlocks)
         {

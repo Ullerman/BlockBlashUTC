@@ -13,6 +13,7 @@ namespace BlockBlast
         public bool[,] shape;
 
         public bool isdragable = true;
+        public bool isPlaced = false;
         public Color color;
 
         public BlockLayout(Vector2 position, bool[,] shape, Color color)
