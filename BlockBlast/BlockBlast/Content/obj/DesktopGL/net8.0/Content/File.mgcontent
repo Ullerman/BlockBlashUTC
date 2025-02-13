@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>C:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/File.spritefont</SourceFile>
+  <SourceTime>2024-08-16T18:04:56+01:00</SourceTime>
+  <DestFile>C:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/bin/DesktopGL/Content/File.xnb</DestFile>
+  <DestTime>2025-02-13T22:15:20.9802185+00:00</DestTime>
+  <Importer>FontDescriptionImporter</Importer>
+  <ImporterTime>2024-08-16T18:05:56+01:00</ImporterTime>
+  <Processor>FontDescriptionProcessor</Processor>
+  <ProcessorTime>2024-08-16T18:05:56+01:00</ProcessorTime>
+  <Parameters>
+    <Key>PremultiplyAlpha</Key>
+    <Value>True</Value>
+  </Parameters>
+  <Parameters>
+    <Key>TextureFormat</Key>
+    <Value>Compressed</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

@@ -1,2 +1,3 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/block.png","c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/bin/DesktopGL/block.xnb","TextureProcessor","Texture2DContent",9657,169005,0.1695727
+"c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/block.png","c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/bin/DesktopGL/block.xnb","TextureProcessor","Texture2DContent",7106,142213,0.1679812
+"c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/File.spritefont","c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/bin/DesktopGL/File.xnb","FontDescriptionProcessor","SpriteFontContent",2068,21538,0.1304749

@@ -19,6 +19,7 @@ public class Game1 : Game
 
     private Texture2D _blockTexture;
     private Texture2D _backgroundBlockTexture;
+    private SpriteFont _font;
 
     //Texture Data
     private Vector2 _BLOCKSIZE = new Vector2(50);
@@ -27,6 +28,7 @@ public class Game1 : Game
 
     //Board Data
     private bool[,] _board = new bool[8, 8];
+    int score;
 
     //blocks
 
@@ -112,6 +114,7 @@ public class Game1 : Game
 
         //Textures
         _blockTexture = Content.Load<Texture2D>("block");
+        _font = Content.Load<SpriteFont>("file");
         _backgroundBlockTexture = rectangleTexture.CreateTexture(_BLOCKSIZE, _primitiveBatch);
     }
 
@@ -227,9 +230,10 @@ public class Game1 : Game
         }
 
         _previousMousePosition = currentMousePosition;
-
-        CheckForFullRow();
-        CheckForFullColumn();
+        int clears = 0;
+        clears += CheckForFullRow();
+        clears += CheckForFullColumn();
+        score += (int)(clears * 100 * (1 + (clears * 0.1)));
         for (int i = 0; i < _board.GetLength(0); i++)
         {
             for (int j = 0; j < _board.GetLength(1); j++)
@@ -568,6 +572,7 @@ public class Game1 : Game
             if (block.isdragable)
                 DrawBlock(BuildBlock(block.position, block.shape), block.color);
         }
+        _spriteBatch.DrawString(_font, $"Score: {score}", new Vector2(10, 10), Color.White);
 
         _spriteBatch.End();
         base.Draw(gameTime);
