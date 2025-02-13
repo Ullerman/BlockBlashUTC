@@ -14,6 +14,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
 
     private PrimitiveBatch _primitiveBatch;
+
     //Textures
 
     private Texture2D _blockTexture;
@@ -120,7 +121,7 @@ public class Game1 : Game
             GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
             || Keyboard.GetState().IsKeyDown(Keys.Escape)
         )
-            Exit();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+            Exit();
         MouseState mouseState = Mouse.GetState();
         Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
         Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
@@ -255,9 +256,9 @@ public class Game1 : Game
             bool fullRow = true;
             for (int col = 0; col < _board.GetLength(1); col++)
             {
-                    fullRow = false;
                 if (!_board[row, col])
                 {
+                    fullRow = false;
                     break;
                 }
             }
@@ -265,13 +266,12 @@ public class Game1 : Game
             if (fullRow)
             {
                 fullRows += 1;
-                
+
                 for (int col = 0; col < _board.GetLength(1); col++)
                 {
                     _board[row, col] = false;
                 }
 
-   
                 _boardBlocks.RemoveAll(block =>
                 {
                     for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
@@ -280,7 +280,7 @@ public class Game1 : Game
                         {
                             if (_backroundBlockPositions[i, j] == block.position && i == row)
                             {
-                                return true; 
+                                return true;
                             }
                         }
                     }
@@ -288,7 +288,6 @@ public class Game1 : Game
                     return false;
                 });
             }
-            
         }
         return fullRows;
     }
