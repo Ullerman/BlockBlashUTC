@@ -57,7 +57,7 @@ namespace BlockBlast
                 {
                     { true, true, true },
                     { false, true, false },
-                    { false, true, false },
+                    
                 }
             },
             {
