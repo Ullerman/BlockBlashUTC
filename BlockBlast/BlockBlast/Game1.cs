@@ -29,8 +29,10 @@ public class Game1 : Game
     //Board Data
     private bool[,] _board = new bool[8, 8];
 
-    private BlockLayout underlayBlock;
-    private int score;
+    private List<Square> underlaySquares;
+    private int _score;
+    private int _roundCombo;
+    private int _totalCombo;
 
     //blocks
 
@@ -104,6 +106,9 @@ public class Game1 : Game
     protected override void Initialize()
     {
         BoardInitilizer(_PADDING);
+        underlaySquares = new List<Square>();
+        _roundCombo = 0;
+        _totalCombo = 0;
 
         base.Initialize();
     }
@@ -130,26 +135,45 @@ public class Game1 : Game
         MouseState mouseState = Mouse.GetState();
         Vector2 currentMousePosition = new Vector2(mouseState.X, mouseState.Y);
         Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
-
+        int score = 0;
+        int clears = 0;
         // test.squarePositions = BuildBlock(test.position, Shapes.GetRandomShapeandRotation(rnd));
 
         if (_pickBlocks.All(ns => ns == null) || _pickBlocks.All(ns => !ns.isdragable))
         {
-            _pickBlocks[0] = new BlockLayout(
-                new Vector2(0, 0),
-                Shapes.GetRandomShapeandRotation(rnd),
-                RandomColour()
-            );
-            _pickBlocks[1] = new BlockLayout(
-                new Vector2(0, 0),
-                Shapes.GetRandomShapeandRotation(rnd),
-                RandomColour()
-            );
-            _pickBlocks[2] = new BlockLayout(
-                new Vector2(0, 0),
-                Shapes.GetRandomShapeandRotation(rnd),
-                RandomColour()
-            );
+            if (_roundCombo > 0)
+            {
+                _totalCombo += 1;
+            }
+            else
+            {
+                _totalCombo = 0;
+            }
+            _roundCombo = 0;
+
+            // _pickBlocks[0] = new BlockLayout(
+            //     new Vector2(0, 0),
+            //     Shapes.GetRandomShapeandRotation(rnd),
+            //     RandomColour()
+            // );
+            // _pickBlocks[1] = new BlockLayout(
+            //     new Vector2(0, 0),
+            //     Shapes.GetRandomShapeandRotation(rnd),
+            //     RandomColour()
+            // );
+            // _pickBlocks[2] = new BlockLayout(
+            //     new Vector2(0, 0),
+            //     Shapes.GetRandomShapeandRotation(rnd),
+            //     RandomColour()
+            // );
+            for (int i = 0; i < _pickBlocks.Length; i++)
+            {
+                _pickBlocks[i] = new BlockLayout(
+                    new Vector2(0),
+                    Shapes.shapes["O"],
+                    RandomColour()
+                );
+            }
 
             // _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
@@ -224,31 +248,23 @@ public class Game1 : Game
                 _pickBlocks[_draggingBlockIndex].position,
                 _pickBlocks[_draggingBlockIndex].shape
             );
-            // BlockLayout ublock;
-            // if (
-            //     CheckBlockCollision(
-            //         _pickBlocks[_draggingBlockIndex],
-            //         _board,
-            //         out bool[,] k,
-            //         out ublock
-            //     )
-            // )
-            // {
-            //     underlayBlock = ublock;
-            //     underlayBlock.color = Color.AliceBlue;
-            // }
+            underlaySquares.Clear();
+            underlaySquares = PlacingUnderlay(_pickBlocks[_draggingBlockIndex]);
         }
         else if (_isDragging && mouseState.LeftButton == ButtonState.Released)
         {
             _isDragging = false;
+            underlaySquares.Clear();
             _board = LockToGrid(ref _pickBlocks[_draggingBlockIndex], _board);
         }
 
         _previousMousePosition = currentMousePosition;
-        int clears = 0;
-        clears += CheckForFullRow();
-        clears += CheckForFullColumn();
+        clears += CheckClears();
+        _roundCombo += clears;
+
         score += (int)(clears * 100 * (1 + (clears * 0.1)));
+        _score += (int)(score * (1 + _roundCombo * 0.1f) * (1 + _totalCombo * 0.1f));
+
         for (int i = 0; i < _board.GetLength(0); i++)
         {
             for (int j = 0; j < _board.GetLength(1); j++)
@@ -267,15 +283,28 @@ public class Game1 : Game
         base.Update(gameTime);
     }
 
-    private int CheckForFullRow()
+    private int CheckClears()
+    {
+        int clears = 0;
+        bool[,] rowBoard = (bool[,])_board.Clone();
+        bool[,] colBoard = (bool[,])_board.Clone();
+
+        clears += CheckForFullRow(rowBoard);
+        clears += CheckForFullColumn(colBoard);
+
+        _board = BooleanAnd(rowBoard, colBoard);
+        return clears;
+    }
+
+    private int CheckForFullRow(bool[,] board)
     {
         int fullRows = 0;
-        for (int row = 0; row < _board.GetLength(0); row++)
+        for (int row = 0; row < board.GetLength(0); row++)
         {
             bool fullRow = true;
-            for (int col = 0; col < _board.GetLength(1); col++)
+            for (int col = 0; col < board.GetLength(1); col++)
             {
-                if (!_board[row, col])
+                if (!board[row, col])
                 {
                     fullRow = false;
                     break;
@@ -285,41 +314,24 @@ public class Game1 : Game
             if (fullRow)
             {
                 fullRows += 1;
-
-                for (int col = 0; col < _board.GetLength(1); col++)
+                for (int col = 0; col < board.GetLength(1); col++)
                 {
-                    _board[row, col] = false;
+                    board[row, col] = false;
                 }
-
-                _boardBlocks.RemoveAll(block =>
-                {
-                    for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
-                        {
-                            if (_backroundBlockPositions[i, j] == block.position && i == row)
-                            {
-                                return true;
-                            }
-                        }
-                    }
-
-                    return false;
-                });
             }
         }
         return fullRows;
     }
 
-    private int CheckForFullColumn()
+    private int CheckForFullColumn(bool[,] board)
     {
         int fullColumns = 0;
-        for (int col = 0; col < _board.GetLength(1); col++)
+        for (int col = 0; col < board.GetLength(1); col++)
         {
             bool fullColumn = true;
-            for (int row = 0; row < _board.GetLength(0); row++)
+            for (int row = 0; row < board.GetLength(0); row++)
             {
-                if (!_board[row, col])
+                if (!board[row, col])
                 {
                     fullColumn = false;
                     break;
@@ -329,35 +341,74 @@ public class Game1 : Game
             if (fullColumn)
             {
                 fullColumns += 1;
-                // Clear the column in the board
-                for (int row = 0; row < _board.GetLength(0); row++)
+                for (int row = 0; row < board.GetLength(0); row++)
                 {
-                    _board[row, col] = false;
+                    board[row, col] = false;
                 }
-
-                _boardBlocks.RemoveAll(block =>
-                {
-                    for (int i = 0; i < _backroundBlockPositions.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < _backroundBlockPositions.GetLength(1); j++)
-                        {
-                            if (_backroundBlockPositions[i, j] == block.position && j == col)
-                            {
-                                return true;
-                            }
-                        }
-                    }
-
-                    return false;
-                });
             }
         }
         return fullColumns;
     }
 
+    private static bool[,] BooleanAnd(bool[,] array1, bool[,] array2)
+    {
+        if (
+            array1.GetLength(0) != array2.GetLength(0)
+            || array1.GetLength(1) != array2.GetLength(1)
+        )
+        {
+            throw new ArgumentException("Arrays must have the same dimensions");
+        }
+
+        int rows = array1.GetLength(0);
+        int cols = array1.GetLength(1);
+        bool[,] result = new bool[rows, cols];
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                // If either array has cleared the cell (false), keep it cleared
+                result[i, j] = array1[i, j] && array2[i, j];
+            }
+        }
+
+        return result;
+    }
+
     private Color RandomColour()
     {
         return new Color(rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
+    }
+
+    private List<Square> PlacingUnderlay(BlockLayout block)
+    {
+        List<Square> newSquares = new List<Square>();
+
+        for (int i = 0; i < block.squarePositions.Length; i++)
+        {
+            Vector2 square = block.squarePositions[i];
+            foreach (Vector2 gridPosition in _backroundBlockPositions)
+            {
+                if (
+                    Vector2.Distance(square, gridPosition) < 16
+                    && !IsPositionOccupied(gridPosition)
+                )
+                {
+                    newSquares.Add(new Square(gridPosition, Color.AliceBlue));
+
+                    break;
+                }
+            }
+        }
+        if (newSquares.Count == block.squarePositions.Length)
+        {
+            foreach (Square square in newSquares)
+            {
+                square.color = Color.LightGreen;
+            }
+        }
+        return newSquares;
     }
 
     private bool CheckBlockCollision(
@@ -599,23 +650,21 @@ public class Game1 : Game
         DrawBackroundBoard();
         // DrawBlock(test.squarePositions, Color.Red);
 
-        if (underlayBlock != null)
-        {
-            DrawBlock(BuildBlock(underlayBlock.position, underlayBlock.shape), underlayBlock.color);
-        }
 
+        DrawSquares(underlaySquares);
         DrawSquares(_boardBlocks);
         if (_boardBlocks.Count > 100)
         {
-            throw new Exception("_boardBlocks is too long");
+            throw new Exception($"_boardBlocks is too long!!!:{_boardBlocks.Count}");
         }
 
         foreach (BlockLayout block in _pickBlocks)
         {
-            if (block.isdragable)
+            if (block.isdragable)  
                 DrawBlock(BuildBlock(block.position, block.shape), block.color);
         }
-        _spriteBatch.DrawString(_font, $"Score: {score}", new Vector2(10, 10), Color.White);
+        _spriteBatch.DrawString(_font, $"Score: {_score}", new Vector2(10, 10), Color.White);
+        _spriteBatch.DrawString(_font, $"Combo : {_totalCombo}", new Vector2(10, 25), Color.White);
 
         _spriteBatch.End();
         base.Draw(gameTime);
