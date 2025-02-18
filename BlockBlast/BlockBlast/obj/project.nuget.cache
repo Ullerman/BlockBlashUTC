@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mCWnMj/aw2w=",
+  "dgSpecHash": "OJBWNwjt8Fg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\BlockBlast.csproj",
+  "projectFilePath": "c:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\BlockBlast.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\leonp\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.8\\microsoft.net.illink.tasks.8.0.8.nupkg.sha512",
     "C:\\Users\\leonp\\.nuget\\packages\\monogame.content.builder.task\\3.8.2.1105\\monogame.content.builder.task.3.8.2.1105.nupkg.sha512",

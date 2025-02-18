@@ -28,7 +28,9 @@ public class Game1 : Game
 
     //Board Data
     private bool[,] _board = new bool[8, 8];
-    int score;
+
+    private BlockLayout underlayBlock;
+    private int score;
 
     //blocks
 
@@ -56,7 +58,7 @@ public class Game1 : Game
         _graphics.PreferredBackBufferHeight = 800;
     }
 
-    private void BoardInitilizer(bool value, float padding)
+    private void BoardInitilizer(float padding)
     {
         int boardWidth = _backroundBlockPositions.GetLength(0);
         int boardHeight = _backroundBlockPositions.GetLength(1);
@@ -101,7 +103,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        BoardInitilizer(false, _PADDING);
+        BoardInitilizer(_PADDING);
 
         base.Initialize();
     }
@@ -222,11 +224,24 @@ public class Game1 : Game
                 _pickBlocks[_draggingBlockIndex].position,
                 _pickBlocks[_draggingBlockIndex].shape
             );
+            // BlockLayout ublock;
+            // if (
+            //     CheckBlockCollision(
+            //         _pickBlocks[_draggingBlockIndex],
+            //         _board,
+            //         out bool[,] k,
+            //         out ublock
+            //     )
+            // )
+            // {
+            //     underlayBlock = ublock;
+            //     underlayBlock.color = Color.AliceBlue;
+            // }
         }
         else if (_isDragging && mouseState.LeftButton == ButtonState.Released)
         {
             _isDragging = false;
-            LockToGrid(ref _pickBlocks[_draggingBlockIndex]);
+            _board = LockToGrid(ref _pickBlocks[_draggingBlockIndex], _board);
         }
 
         _previousMousePosition = currentMousePosition;
@@ -345,10 +360,17 @@ public class Game1 : Game
         return new Color(rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
     }
 
-    private void LockToGrid(ref BlockLayout block)
+    private bool CheckBlockCollision(
+        BlockLayout block,
+        bool[,] tboard,
+        out bool[,] board,
+        out BlockLayout cBlock
+    )
     {
+        int sqrCheck = 0;
+        board = (bool[,])tboard.Clone(); // Clone the board to avoid modifying the original
+        bool squareCheck = false;
         Vector2[] newsquares = new Vector2[block.squarePositions.Length];
-        byte sqrcheck = 0;
 
         for (int i = 0; i < block.squarePositions.Length; i++)
         {
@@ -361,17 +383,18 @@ public class Game1 : Game
                 )
                 {
                     newsquares[i] = gridPosition;
-                    sqrcheck++;
+                    sqrCheck++;
                     break;
                 }
             }
         }
-
-        if (sqrcheck == block.squarePositions.Length)
+        if (sqrCheck == block.squarePositions.Length)
         {
+            squareCheck = true;
             block.position = newsquares[0];
-            block.isdragable = false;
             block.squarePositions = newsquares;
+            block.isdragable = false;
+            block.isPlaced = true;
 
             foreach (Vector2 square in block.squarePositions)
             {
@@ -381,13 +404,27 @@ public class Game1 : Game
                     {
                         if (_backroundBlockPositions[i, j] == square)
                         {
-                            _board[i, j] = true;
+                            board[i, j] = true;
                             break;
                         }
                     }
                 }
             }
+        }
 
+        cBlock = block;
+        return squareCheck;
+    }
+
+    private bool[,] LockToGrid(ref BlockLayout block, bool[,] board)
+    {
+        BlockLayout tblock;
+        bool sqrCheck = CheckBlockCollision(block, board, out board, out tblock);
+
+        if (sqrCheck)
+        {
+            block = tblock;
+            block.isdragable = false;
             foreach (Vector2 square in block.squarePositions)
             {
                 if (!_boardBlocks.Any(s => s.position == square))
@@ -396,6 +433,7 @@ public class Game1 : Game
                 }
             }
         }
+        return board;
     }
 
     private bool IsPositionOccupied(Vector2 position)
@@ -560,6 +598,11 @@ public class Game1 : Game
 
         DrawBackroundBoard();
         // DrawBlock(test.squarePositions, Color.Red);
+
+        if (underlayBlock != null)
+        {
+            DrawBlock(BuildBlock(underlayBlock.position, underlayBlock.shape), underlayBlock.color);
+        }
 
         DrawSquares(_boardBlocks);
         if (_boardBlocks.Count > 100)
