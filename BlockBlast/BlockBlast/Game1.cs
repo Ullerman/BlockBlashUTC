@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using VectorGraphics;
 
 namespace BlockBlast;
@@ -137,7 +138,6 @@ public class Game1 : Game
         Vector2 mouseDelta = currentMousePosition - _previousMousePosition;
         int score = 0;
         int clears = 0;
-        // test.squarePositions = BuildBlock(test.position, Shapes.GetRandomShapeandRotation(rnd));
 
         if (_pickBlocks.All(ns => ns == null) || _pickBlocks.All(ns => !ns.isdragable))
         {
@@ -151,31 +151,15 @@ public class Game1 : Game
             }
             _roundCombo = 0;
 
-            // _pickBlocks[0] = new BlockLayout(
-            //     new Vector2(0, 0),
-            //     Shapes.GetRandomShapeandRotation(rnd),
-            //     RandomColour()
-            // );
-            // _pickBlocks[1] = new BlockLayout(
-            //     new Vector2(0, 0),
-            //     Shapes.GetRandomShapeandRotation(rnd),
-            //     RandomColour()
-            // );
-            // _pickBlocks[2] = new BlockLayout(
-            //     new Vector2(0, 0),
-            //     Shapes.GetRandomShapeandRotation(rnd),
-            //     RandomColour()
-            // );
             for (int i = 0; i < _pickBlocks.Length; i++)
             {
                 _pickBlocks[i] = new BlockLayout(
                     new Vector2(0),
-                    Shapes.shapes["O"],
+                    Shapes.GetRandomShapeandRotation(rnd),
                     RandomColour()
                 );
             }
 
-            // _pickBlocks[2].shape[2, 0] = false;
             for (int i = 0; i < _pickBlocks.Length; i++)
             {
                 _pickBlocks[i].squarePositions = BuildBlock(
@@ -204,7 +188,6 @@ public class Game1 : Game
                     );
                     _pickBlocks[i].isPlaced = true;
                 }
-                // _pickBlocks[i] = new BlockLayout(new Vector2(0, 0), L_Shape.shape, RandomColour());
             }
         }
 
@@ -231,10 +214,6 @@ public class Game1 : Game
                         break;
                     }
                 }
-                // if (!_pickBlocks[i].isdragable)
-                // {
-                //     _pickBlocks[i] = null;
-                // }
             }
         }
         else if (
@@ -277,9 +256,11 @@ public class Game1 : Game
                 }
             }
         }
-
-        // TODO: Add your update logic here
-
+        if(Keyboard.GetState().IsKeyDown(Keys.Space))
+        {
+            PrintBoolArray(_board);
+        }
+        
         base.Update(gameTime);
     }
 
@@ -612,7 +593,7 @@ public class Game1 : Game
     private void DrawBackroundBoard()
     {
         Color backgroundBlockColor = new Color(32, 36, 69);
-        PrintBoolArray(_board);
+        
 
         for (int i = 0; i < _board.GetLength(0); i++)
         {
