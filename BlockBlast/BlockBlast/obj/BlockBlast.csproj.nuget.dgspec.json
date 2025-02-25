@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/BlockBlast.csproj": {}
+    "c:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\BlockBlast.csproj": {}
   },
   "projects": {
-    "/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/BlockBlast.csproj": {
+    "c:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\BlockBlast.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/BlockBlast.csproj",
+        "projectUniqueName": "c:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\BlockBlast.csproj",
         "projectName": "BlockBlast",
-        "projectPath": "/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/BlockBlast.csproj",
-        "packagesPath": "/Users/sampartington/.nuget/packages/",
-        "outputPath": "/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/obj/",
+        "projectPath": "c:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\BlockBlast.csproj",
+        "packagesPath": "C:\\Users\\leonp\\.nuget\\packages\\",
+        "outputPath": "c:\\Users\\leonp\\Documents\\randomgamesimade\\BlockBlashUTC\\BlockBlast\\BlockBlast\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/sampartington/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\leonp\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -36,9 +43,8 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "all"
-        },
-        "SdkAnalysisLevel": "9.0.100"
+          "auditMode": "direct"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -47,7 +53,7 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.11, )",
+              "version": "[8.0.8, )",
               "autoReferenced": true
             },
             "MonoGame.Content.Builder.Task": {
@@ -74,26 +80,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.11, 8.0.11]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.osx-arm64",
-              "version": "[8.0.11, 8.0.11]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.11, 8.0.11]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.402/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

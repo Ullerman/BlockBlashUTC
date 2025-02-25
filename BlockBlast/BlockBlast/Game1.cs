@@ -1,11 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 using VectorGraphics;
 
 namespace BlockBlast;
@@ -112,9 +111,15 @@ public class Game1 : Game
         underlaySquares = new List<Square>();
         _roundCombo = 0;
         _totalCombo = 0;
-        
-        _highscore = int.Parse(File.ReadAllText("highscore.txt"));
-
+        try
+        {
+            _highscore = int.Parse(File.ReadAllText("highscore.txt"));
+        }
+        catch (FileNotFoundException)
+        {
+            File.WriteAllText("highscore.txt", "0");
+            _highscore = 0;
+        }
         base.Initialize();
     }
 
@@ -260,10 +265,10 @@ public class Game1 : Game
                 }
             }
         }
-        if(Keyboard.GetState().IsKeyDown(Keys.Space))
+        if (Keyboard.GetState().IsKeyDown(Keys.Space))
         {
             // PrintBoolArray(_board);
-            Initialize();
+            ResetGame();
         }
         _highscore = int.Parse(File.ReadAllText("highscore.txt"));
         if (_score > _highscore)
@@ -338,7 +343,6 @@ public class Game1 : Game
             }
         }
         return fullColumns;
-
     }
 
     private static bool[,] BooleanAnd(bool[,] array1, bool[,] array2)
@@ -603,7 +607,6 @@ public class Game1 : Game
     private void DrawBackroundBoard()
     {
         Color backgroundBlockColor = new Color(32, 36, 69);
-        
 
         for (int i = 0; i < _board.GetLength(0); i++)
         {
@@ -651,14 +654,64 @@ public class Game1 : Game
 
         foreach (BlockLayout block in _pickBlocks)
         {
-            if (block.isdragable)  
+            if (block.isdragable)
                 DrawBlock(BuildBlock(block.position, block.shape), block.color);
         }
         _spriteBatch.DrawString(_font, $"Score: {_score}", new Vector2(10, 10), Color.White);
         _spriteBatch.DrawString(_font, $"Combo : {_totalCombo}", new Vector2(10, 25), Color.White);
-        _spriteBatch.DrawString(_font, $"Highscore: {_highscore}", new Vector2(10, 40), Color.White);
+        _spriteBatch.DrawString(
+            _font,
+            $"Highscore: {_highscore}",
+            new Vector2(10, 40),
+            Color.White
+        );
 
         _spriteBatch.End();
         base.Draw(gameTime);
+    }
+
+    private void ResetGame()
+    {
+        // Reset game state variables
+        _score = 0;
+        _roundCombo = 0;
+        _totalCombo = 0;
+        _isDragging = false;
+        _draggingBlockIndex = -1;
+        _previousMousePosition = Vector2.Zero;
+
+        // Clear the board and blocks
+        _board = new bool[8, 8];
+        _boardBlocks.Clear();
+        underlaySquares.Clear();
+        _pickBlocks = new BlockLayout[3];
+
+        // Reinitialize the board and blocks
+        BoardInitilizer(_PADDING);
+        InitializeBlocks();
+    }
+
+    private void InitializeBlocks()
+    {
+        for (int i = 0; i < _pickBlocks.Length; i++)
+        {
+            _pickBlocks[i] = new BlockLayout(
+                new Vector2(0),
+                Shapes.GetRandomShapeandRotation(rnd),
+                RandomColour()
+            );
+        }
+
+        for (int i = 0; i < _pickBlocks.Length; i++)
+        {
+            _pickBlocks[i].squarePositions = BuildBlock(
+                _pickBlocks[i].position,
+                _pickBlocks[i].shape
+            );
+            _pickBlocks[i].position = new Vector2(
+                blockSpawnPlates[i].Position.X - _PLATERADIUS / 2 + 20,
+                blockSpawnPlates[i].Position.Y - _PLATERADIUS / 2 + 20
+            );
+        }
     }
 }

@@ -4,8 +4,8 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/Content/block.png</File>
-    <File>/Users/sampartington/Documents/BlockBlashUTC/BlockBlast/BlockBlast/Content/File.spritefont</File>
+    <File>c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/block.png</File>
+    <File>c:/Users/leonp/Documents/randomgamesimade/BlockBlashUTC/BlockBlast/BlockBlast/Content/File.spritefont</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />
