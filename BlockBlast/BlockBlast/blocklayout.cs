@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace BlockBlast
 {
@@ -57,7 +59,6 @@ namespace BlockBlast
                 {
                     { true, true, true },
                     { false, true, false },
-                    
                 }
             },
             {
@@ -87,6 +88,32 @@ namespace BlockBlast
                 }
             },
         };
+
+        public static void LoadShapesFromJson(string filePath)
+        {
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                Dictionary<string, bool[,]> tshapes = JsonConvert.DeserializeObject<Dictionary<string, bool[,]>>(json);
+                if (tshapes != null)
+                {
+                    shapes = tshapes;
+                }
+                else
+                {
+                    Console.WriteLine("Shapes file is empty");
+                }
+            }
+            catch (Exception ex)
+            {
+                string json = JsonConvert.SerializeObject(shapes, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+                Console.WriteLine("Shapes file not found, created new one");
+            }
+
+   
+        }
+
         public static bool[,] RotateShape(bool[,] matrix)
         {
             int rows = matrix.GetLength(0);

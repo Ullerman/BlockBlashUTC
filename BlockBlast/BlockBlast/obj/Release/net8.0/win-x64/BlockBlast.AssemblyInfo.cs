@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlockBlast")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+410a0836c0f42874d6eeef9c510c44ce58a8ccf6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+325aed1972f42e8ddb31a2041857463b59f7a295")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlockBlast")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlockBlast")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

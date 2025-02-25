@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using VectorGraphics;
 
 namespace BlockBlast;
@@ -55,6 +56,7 @@ public class Game1 : Game
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
+
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
@@ -120,6 +122,7 @@ public class Game1 : Game
             File.WriteAllText("highscore.txt", "0");
             _highscore = 0;
         }
+        Shapes.LoadShapesFromJson("shapes.json");
         base.Initialize();
     }
 
@@ -130,9 +133,32 @@ public class Game1 : Game
         RectangleTexture rectangleTexture = new RectangleTexture();
 
         //Textures
-        _blockTexture = Content.Load<Texture2D>("block");
+        try
+        {
+            _blockTexture = LoadTextureFromFile("block.jpg");
+        }
+        catch (FileNotFoundException)
+        {
+            try
+            {
+                _blockTexture = LoadTextureFromFile("block.png");
+            }
+            catch (FileNotFoundException)
+            {
+                _blockTexture = Content.Load<Texture2D>("block");
+            }
+        }
+
         _font = Content.Load<SpriteFont>("file");
         _backgroundBlockTexture = rectangleTexture.CreateTexture(_BLOCKSIZE, _primitiveBatch);
+    }
+
+    private Texture2D LoadTextureFromFile(string filePath)
+    {
+        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+        {
+            return Texture2D.FromStream(GraphicsDevice, fileStream);
+        }
     }
 
     protected override void Update(GameTime gameTime)
