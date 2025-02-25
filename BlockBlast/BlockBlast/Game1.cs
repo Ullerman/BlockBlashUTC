@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -32,6 +33,7 @@ public class Game1 : Game
 
     private List<Square> underlaySquares;
     private int _score;
+    private int _highscore;
     private int _roundCombo;
     private int _totalCombo;
 
@@ -110,6 +112,8 @@ public class Game1 : Game
         underlaySquares = new List<Square>();
         _roundCombo = 0;
         _totalCombo = 0;
+        
+        _highscore = int.Parse(File.ReadAllText("highscore.txt"));
 
         base.Initialize();
     }
@@ -258,9 +262,14 @@ public class Game1 : Game
         }
         if(Keyboard.GetState().IsKeyDown(Keys.Space))
         {
-            PrintBoolArray(_board);
+            // PrintBoolArray(_board);
+            Initialize();
         }
-        
+        _highscore = int.Parse(File.ReadAllText("highscore.txt"));
+        if (_score > _highscore)
+        {
+            File.WriteAllText("highscore.txt", $"{_score}");
+        }
         base.Update(gameTime);
     }
 
@@ -329,6 +338,7 @@ public class Game1 : Game
             }
         }
         return fullColumns;
+
     }
 
     private static bool[,] BooleanAnd(bool[,] array1, bool[,] array2)
@@ -372,7 +382,7 @@ public class Game1 : Game
             foreach (Vector2 gridPosition in _backroundBlockPositions)
             {
                 if (
-                    Vector2.Distance(square, gridPosition) < 16
+                    Vector2.Distance(square, gridPosition) < 24
                     && !IsPositionOccupied(gridPosition)
                 )
                 {
@@ -410,7 +420,7 @@ public class Game1 : Game
             foreach (Vector2 gridPosition in _backroundBlockPositions)
             {
                 if (
-                    Vector2.Distance(square, gridPosition) < 16
+                    Vector2.Distance(square, gridPosition) < 24
                     && !IsPositionOccupied(gridPosition)
                 )
                 {
@@ -646,6 +656,7 @@ public class Game1 : Game
         }
         _spriteBatch.DrawString(_font, $"Score: {_score}", new Vector2(10, 10), Color.White);
         _spriteBatch.DrawString(_font, $"Combo : {_totalCombo}", new Vector2(10, 25), Color.White);
+        _spriteBatch.DrawString(_font, $"Highscore: {_highscore}", new Vector2(10, 40), Color.White);
 
         _spriteBatch.End();
         base.Draw(gameTime);
